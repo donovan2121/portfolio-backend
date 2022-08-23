@@ -1,4 +1,3 @@
 boto3
-'moto[all]'
-import unittest
+moto
 botocore.exceptions
