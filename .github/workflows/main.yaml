@@ -44,5 +44,5 @@ jobs:
           sam validate
       - run: sam build 
         working-directory: serverless-api-stack
-      - run: sam deploy --no-confirm-changeset --nofail-on-empty-changeset
+      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
         working-directory: serverless-api-stack
