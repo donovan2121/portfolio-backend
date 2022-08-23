@@ -1,0 +1,125 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+      
+  LambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: portfolio_lambda/function.zip
+      # FunctionName: 'serverless-function'
+      Handler: lambda_function.lambda_handler
+      MemorySize: 512
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PortfolioTable
+      Role: arn:aws:iam::487150266466:role/serverless-api-role
+      Runtime: python3.9
+      Timeout: 30
+      Events:
+        Health:
+          Type: Api
+          Properties:
+            Path: /health
+            Method: GET
+        VisitorsGetEvent:
+          Type: Api
+          Properties: 
+            Path: /visitors
+            Method: GET
+        VisitorsPostEvent:
+          Type: Api
+          Properties: 
+            Path: /visitors
+            Method: POST
+        VisitorsPatchEvent:
+          Type: Api
+          Properties: 
+            Path: /visitors
+            Method: PATCH    
+          
+
+
+
+
+# # API gateway resource
+
+#   HealthResource:
+#     Type: AWS::ApiGateway::Resource
+#     Properties:
+#       ParentId: !GetAtt PortfolioApi.RootResourceId
+#       PathPart: 'health'
+#       RestApiId: !Ref PortfolioApi 
+
+#   VisitorsResource:
+#     Type: AWS::ApiGateway::Resource
+#     Properties:
+#       ParentId: !GetAtt PortfolioApi.RootResourceId
+#       PathPart: 'visitors'
+#       RestApiId: !Ref PortfolioApi 
+
+#   HealthResourceGetMethod:
+#     Type: 'AWS::ApiGateway::Method'
+#     Properties:
+#       RestApiId: !Ref PortfolioApi
+#       ResourceId: !Ref HealthResource
+#       HttpMethod: GET
+#       AuthorizationType: NONE
+#       Integration:
+#         Type: AWS_PROXY
+#         IntegrationHttpMethod: POST
+#         Uri: !Sub >-
+#           arn:aws:apigateway:${AWS::Region}:lambda:path/functions/${LambdaFunction.Arn}/invocations
+
+#   VisitorsResourceGetMethod:
+#     Type: 'AWS::ApiGateway::Method'
+#     Properties:
+#       RestApiId: !Ref PortfolioApi
+#       ResourceId: !Ref VisitorsResource
+#       HttpMethod: GET
+#       AuthorizationType: NONE
+#       Integration:
+#         Type: AWS_PROXY
+#         IntegrationHttpMethod: GET
+#         Uri: !Sub >-
+#           arn:aws:apigateway:${AWS::Region}:lambda:path/functions/${LambdaFunction.Arn}/invocations
+
+#   VisitorsResourcePostMethod:
+#     Type: 'AWS::ApiGateway::Method'
+#     Properties:
+#       RestApiId: !Ref PortfolioApi
+#       ResourceId: !Ref VisitorsResource
+#       HttpMethod: POST
+#       AuthorizationType: NONE
+#       Integration:
+#         Type: AWS_PROXY
+#         IntegrationHttpMethod: POST
+#         Uri: !Sub >-
+#           arn:aws:apigateway:${AWS::Region}:lambda:path/functions/${LambdaFunction.Arn}/invocations
+
+#   VisitorsResourcePatchMethod:
+#     Type: 'AWS::ApiGateway::Method'
+#     Properties:
+#       RestApiId: !Ref PortfolioApi
+#       ResourceId: !Ref VisitorsResource
+#       HttpMethod: PATCH
+#       AuthorizationType: NONE
+#       Integration:
+#         Type: HTTP_PROXY
+#         IntegrationHttpMethod: PATCH
+#         Uri: !Sub >-
+#           arn:aws:apigateway:${AWS::Region}:lambda:path/functions/${LambdaFunction.Arn}/invocations
+
+
+
+  PortfolioTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: id
+        Type: String
+
+
+Outputs:
+  PortfolioApi:
+    Description: "API Gateway endpoint URL for Prod stage for serverless function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/visitors/"
